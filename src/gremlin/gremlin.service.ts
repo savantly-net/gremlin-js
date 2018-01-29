@@ -62,7 +62,10 @@ export class GremlinService {
   sendMessage(message: string, callback?: (response: GremlinQueryResponse) => void) {
     const query = new GremlinQuery(message, this.options);
     query.onComplete = callback;
-    this.connection.sendMessage(query);
+    const sent = this.connection.sendMessage(query);
+    if (!sent) {
+      this.connection.open();
+    }
   }
 
   constructor() { }

@@ -5,13 +5,14 @@ const CopyPkgJsonPlugin = require('copy-pkg-json-webpack-plugin/dist');
 const pkgPlugin = new CopyPkgJsonPlugin({
     remove: ['devDependencies', 'scripts'],
     replace: {
-    	main: "index.js"
+    	module: "index.js",
+    	main: "gremlin.umd.js"
     }
 });
 
 
 const config = {
-	devtool : "source-map",
+	devtool : "inline-source-map",
 	output : {
 		path : path.resolve(__dirname, 'dist')
 	},
@@ -27,12 +28,7 @@ const config = {
     				loader : 'awesome-typescript-loader'
     			},
     			exclude: [ /node_modules/, '**/*.spec.ts' ]
-    		},
-			{
-				enforce : "pre",
-				test : /\.(t|j)sx?$/,
-				loader : "source-map-loader"
-			}
+    		}
 		]
 	},
     node: {

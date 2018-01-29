@@ -8,7 +8,7 @@ export declare class GremlinWebSocket {
     socket(): WebSocket;
     close(): void;
     isOpen(): boolean;
-    sendMessage(gremlinQuery: GremlinQuery): void;
+    sendMessage(gremlinQuery: GremlinQuery): boolean;
     /**
      * Process the current command queue, sending commands to Gremlin Server
      * (First In, First Out).
@@ -25,6 +25,7 @@ export declare class GremlinWebSocket {
             sasl: string;
         };
     };
+    isConnecting(): boolean;
     open(): void;
     constructor(options: GremlinClientOptions);
 }

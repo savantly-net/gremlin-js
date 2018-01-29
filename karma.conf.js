@@ -49,5 +49,5 @@ module.exports = function (config) {
     singleRun: false
   });
   
-  config.browsers.push('Firefox');
+  config.browsers.push('Chrome');
 };

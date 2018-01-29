@@ -18,16 +18,17 @@ export class GremlinWebSocket {
   }
 
   isOpen() {
-    return this._ws.OPEN === this._ws.readyState;
+    return this._ws && this._ws.OPEN === this._ws.readyState;
   }
 
   sendMessage(gremlinQuery: GremlinQuery) {
     if (!this.isOpen()) {
-      this.open();
       this._queue.push(gremlinQuery);
+      return false;
     } else {
       this._queries[gremlinQuery.id] = gremlinQuery;
-      this._ws.send(gremlinQuery.binaryFormat());
+      this._ws.send(gremlinQuery.jsonFormat());
+      return true;
     }
   }
 
@@ -38,7 +39,7 @@ export class GremlinWebSocket {
   executeQueue() {
     while (this._queue.length > 0) {
       const query = this._queue.shift();
-      this.sendMessage(query);
+      setTimeout(this.sendMessage(query), 1000);
     }
   }
 
@@ -133,7 +134,14 @@ export class GremlinWebSocket {
     return message;
   }
 
+  isConnecting() {
+    return this._ws && this._ws.readyState === this._ws.CONNECTING;
+  }
+
   open() {
+    if (this.isOpen() || this.isConnecting()) {
+      return;
+    }
     const address = `ws${this.options.ssl ? 's' : ''}://${this.options.host}:${this.options.port}${this.options.path}`;
     this._ws = new WebSocket(address);
     this._ws.binaryType = 'arraybuffer';
