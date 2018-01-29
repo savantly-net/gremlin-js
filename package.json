@@ -1,6 +1,6 @@
 {
   "name": "@savantly/gremlin-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Gremlin client [Tinkerpop]",
   "main": "public_api.ts",
   "homepage": "https://github.com/savantly-net/gremlin-js",
@@ -51,6 +51,5 @@
     "typescript": "^2.6.2",
     "webpack": "^3.10.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
