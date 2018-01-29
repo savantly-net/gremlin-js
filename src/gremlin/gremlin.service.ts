@@ -61,50 +61,9 @@ export class GremlinService {
 
   sendMessage(message: string, callback?: (response: GremlinQueryResponse) => void) {
     const query = new GremlinQuery(message, this.options);
-    query.onMessage = callback;
+    query.onComplete = callback;
     this.connection.sendMessage(query);
   }
-
-/*
-  traversalSource() {
-    const {g} = grem;
-
-    let chain = g;
-
-    const awaitable = new Proxy(g, {
-      get: (traversal, name, receiver) => {
-        if (name === 'toPromise') {
-          return () =>
-            new Promise((resolve, reject) => {
-              const {query, params} = renderChain(chain);
-              this.execute(query, params, (err, result) => {
-                if (err) {
-                  return reject(err);
-                }
-                resolve(result);
-              });
-            });
-        }
-
-        chain = chain[name];
-
-        return new Proxy(traversal, {
-          get(target2, name2, receiver2) {
-            target2 = target2[name];
-            return awaitable;
-          },
-        })[name];
-      },
-      apply(traversal, thisArg, args) {
-        Reflect.apply(chain, null, args);
-
-        return awaitable;
-      },
-    });
-
-    return awaitable;
-  }
-*/
 
   constructor() { }
 }

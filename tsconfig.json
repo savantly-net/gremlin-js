@@ -6,6 +6,7 @@
     "sourceMap": true,
     "declaration": true,
     "moduleResolution": "node",
+    "module": "commonjs",
     "target": "es2015",
     "typeRoots": [	
       "node_modules/@types"
@@ -27,6 +28,7 @@
   "exclude": [
     "**/*.spec.ts",
     "./dist",
-    "**/*.js"
+    "**/*.js",
+    "node_modules"
   ]
 }

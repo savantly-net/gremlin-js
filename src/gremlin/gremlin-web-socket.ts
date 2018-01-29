@@ -22,12 +22,12 @@ export class GremlinWebSocket {
   }
 
   sendMessage(gremlinQuery: GremlinQuery) {
-    if (!this.isOpen) {
+    if (!this.isOpen()) {
       this.open();
       this._queue.push(gremlinQuery);
     } else {
       this._queries[gremlinQuery.id] = gremlinQuery;
-      this._ws.send(gremlinQuery.binaryFormat);
+      this._ws.send(gremlinQuery.binaryFormat());
     }
   }
 

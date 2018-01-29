@@ -5,8 +5,7 @@ const CopyPkgJsonPlugin = require('copy-pkg-json-webpack-plugin/dist');
 const pkgPlugin = new CopyPkgJsonPlugin({
     remove: ['devDependencies', 'scripts'],
     replace: {
-    	module: "gremlin.es6.js",
-    	main: "gremlin.umd.js"
+    	main: "index.js"
     }
 });
 
@@ -22,6 +21,13 @@ const config = {
 	},
 	module : {
 		rules : [
+			{
+    			test: /\.ts$/,
+    			use : {
+    				loader : 'awesome-typescript-loader'
+    			},
+    			exclude: [ /node_modules/, '**/*.spec.ts' ]
+    		},
 			{
 				enforce : "pre",
 				test : /\.(t|j)sx?$/,
@@ -41,49 +47,23 @@ const config = {
 
 
 const es6Config = _.assign({}, config, {
-    name: "es2015",
-	entry : './public_api.ts',
+    name: "es6",
+	entry : './index.ts',
     output: {
     	path : path.resolve(__dirname, 'dist'),
 		filename: "gremlin.es6.js"
     },
-    plugins: [ pkgPlugin ],
-    module: {
-    	rules: [
-    		{
-    			test: /\.ts$/,
-    			use : {
-    				loader : 'awesome-typescript-loader',
-    				options: {
-    			        configFileName: 'src/tsconfig.es6.json'
-    			    },
-    			},
-    			exclude: [ /node_modules/, '**/*.spec.ts' ]
-    		}
-    	]
-    }
+    plugins: [ pkgPlugin ]
 });
-console.debug(es6Config);
 
 const umdConfig = _.assign({}, config, {
     name: "umd",
-	entry : './public_api.ts',
+	entry : './index.ts',
     output: {
     	path : path.resolve(__dirname, 'dist'),
 		libraryTarget: 'umd',
 		library: "gremlinjs",
 		filename: "gremlin.umd.js"
-    },
-    module: {
-    	rules: [
-    		{
-    			test: /\.ts$/,
-    			use : {
-    				loader : 'awesome-typescript-loader'
-    			},
-    			exclude: [ /node_modules/, '**/*.spec.ts' ]
-    		}
-    	]
     }
 });
 console.debug(umdConfig);

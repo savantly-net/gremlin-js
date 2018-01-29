@@ -2,8 +2,7 @@
   "name": "@savantly/gremlin-js",
   "version": "1.0.5",
   "description": "Gremlin client [Tinkerpop]",
-  "module": "dist/gremlin.es6.js",
-  "main": "dist/gremlin.umd.js",
+  "main": "dist/index.js",
   "homepage": "https://github.com/savantly-net/gremlin-js",
   "private": false,
   "repository": {
