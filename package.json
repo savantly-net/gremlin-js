@@ -1,16 +1,17 @@
 {
   "name": "@savantly/gremlin-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Gremlin client [Tinkerpop]",
   "main": "public_api.ts",
   "homepage": "https://github.com/savantly-net/gremlin-js",
+  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/savantly-net/gremlin-js.git"
   },
   "browser": true,
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "yarn clean && webpack --config webpack.config.js",
     "test": "yarn clean && karma start --single-run",
     "test-watch": "yarn clean && karma start",
     "lint": "tslint --project ./tsconfig.json",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/jasmine": "^2.8.6",
     "awesome-typescript-loader": "^3.4.1",
+    "copy-pkg-json-webpack-plugin": "^0.0.31",
     "core-js": "^2.5.1",
     "cpr": "^2.2.0",
     "jasmine-core": "^2.8.0",
@@ -38,6 +40,7 @@
     "karma-firefox-launcher": "^1.0.1",
     "karma-jasmine": "^1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "0.0.31",
     "karma-webpack": "^2.0.9",
     "protractor": "^5.1.2",
@@ -49,6 +52,5 @@
     "webpack": "^3.10.0"
   },
   "dependencies": {
-    "karma-sourcemap-loader": "^0.3.7"
   }
 }

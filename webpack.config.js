@@ -1,4 +1,10 @@
 var path = require('path');
+const CopyPkgJsonPlugin = require('copy-pkg-json-webpack-plugin/dist');
+
+const pkgPlugin = new CopyPkgJsonPlugin({
+    remove: ['devDependencies', 'scripts'],
+    replace: {main: 'gremlin.js'}}
+);
 
 module.exports = {
 	entry : './public_api.ts',
@@ -41,5 +47,8 @@ module.exports = {
         module: false,
         clearImmediate: false,
         setImmediate: false
-    }
+    },
+    plugins: [
+    	pkgPlugin
+    ]
 }

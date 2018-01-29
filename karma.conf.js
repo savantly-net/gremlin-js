@@ -28,7 +28,7 @@ module.exports = function (config) {
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     files: [
-      { pattern: specFiles }
+      { pattern: specFiles, watched: true }
     ],
     preprocessors: {
     	'**/*.ts': ['webpack', 'sourcemap']
@@ -43,15 +43,11 @@ module.exports = function (config) {
     reporters: ['spec', 'kjhtml', 'coverage-istanbul'],
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
-    autoWatch: true,
+    // logLevel: config.LOG_INFO,
+    autoWatch: false,
     browsers: [],
     singleRun: false
   });
   
-  if (!isWin) {
-	 config.browsers.push('Chrome'); 
-  } else {
-	 config.browsers.push('Firefox');
-  }
+  config.browsers.push('Firefox');
 };
