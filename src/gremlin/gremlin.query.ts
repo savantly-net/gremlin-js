@@ -21,8 +21,8 @@ export class GremlinQuery {
    /*
    * returns a binary format ready for web-socket transfer
    */
-  get binaryFormat() {
-    let serializedMessage = this.jsonFormat;
+  binaryFormat() {
+    let serializedMessage = this.jsonFormat();
     serializedMessage = decodeURI(encodeURIComponent(serializedMessage));
 
     // Let's start packing the message into binary
@@ -40,7 +40,7 @@ export class GremlinQuery {
   /**
    * returns a serialized json message ready for transfer
    */
-  get jsonFormat() {
+  jsonFormat() {
     const msg = {
       requestId: this.id,
       op: this.options.processor,

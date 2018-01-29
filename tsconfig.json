@@ -1,20 +1,18 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
+    "outDir": "./dist/",
     "baseUrl": "src",
     "sourceMap": true,
-    "declaration": false,
+    "declaration": true,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "target": "es5",
-    "allowJs": true,
+    "target": "es2015",
     "typeRoots": [	
       "node_modules/@types"
     ],
     "types": [
-      "jasmine"
+      "jasmine",
+      "node"
     ],
     "lib": [
       "es2016",
@@ -23,8 +21,10 @@
     "paths": {
     }
   },
+  "include": [
+  	"**/*.ts"
+  ],
   "exclude": [
-    "test.ts",
     "**/*.spec.ts",
     "./dist",
     "**/*.js"

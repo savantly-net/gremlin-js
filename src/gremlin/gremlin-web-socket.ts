@@ -9,7 +9,7 @@ export class GremlinWebSocket {
   private _queries: {[id: string]: GremlinQuery} = {};
   private _queue = new Array<GremlinQuery>();
 
-  get socket() {
+  socket() {
     return this._ws;
   }
 
@@ -17,7 +17,7 @@ export class GremlinWebSocket {
     this._ws.close();
   }
 
-  get isOpen() {
+  isOpen() {
     return this._ws.OPEN === this._ws.readyState;
   }
 

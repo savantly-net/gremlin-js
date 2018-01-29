@@ -2,8 +2,8 @@
   "name": "@savantly/gremlin-js",
   "version": "1.0.5",
   "description": "Gremlin client [Tinkerpop]",
-  "module": "public_api.ts",
-  "main": "dist/gremlin.js",
+  "module": "dist/gremlin.es6.js",
+  "main": "dist/gremlin.umd.js",
   "homepage": "https://github.com/savantly-net/gremlin-js",
   "private": false,
   "repository": {
@@ -12,7 +12,7 @@
   },
   "browser": true,
   "scripts": {
-    "build": "yarn clean && webpack --config webpack.config.js",
+    "build": "yarn clean && tsc --project tsconfig.json && webpack --config webpack.config.js",
     "test": "yarn clean && karma start --single-run",
     "test-watch": "yarn clean && karma start",
     "lint": "tslint --project ./tsconfig.json",

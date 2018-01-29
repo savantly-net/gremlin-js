@@ -1,45 +1,34 @@
 var path = require('path');
+const _ = require('lodash');
 const CopyPkgJsonPlugin = require('copy-pkg-json-webpack-plugin/dist');
 
 const pkgPlugin = new CopyPkgJsonPlugin({
     remove: ['devDependencies', 'scripts'],
-    replace: {main: 'gremlin.js'}}
-);
+    replace: {
+    	module: "gremlin.es6.js",
+    	main: "gremlin.umd.js"
+    }
+});
 
-module.exports = {
-	entry : './public_api.ts',
+
+const config = {
+	devtool : "source-map",
 	output : {
-		path : path.resolve(__dirname, 'dist'),
-		filename : 'gremlin.js',
-		library: "gremlinjs"
+		path : path.resolve(__dirname, 'dist')
 	},
 	resolve : {
-		// changed from extensions: [".js", ".jsx"]
 		extensions : [ ".ts", ".tsx", ".js", ".jsx" ],
         modules: ['node_modules']
 	},
 	module : {
 		rules : [
 			{
-				test : /\.(t|j)sx?$/,
-				use : {
-					loader : 'awesome-typescript-loader'
-				},
-				exclude: [ /node_modules/, '**/*.spec.ts' ]
-			},
-			// addition - add source-map support 
-			{
 				enforce : "pre",
-				test : /\.js$/,
+				test : /\.(t|j)sx?$/,
 				loader : "source-map-loader"
 			}
 		]
 	},
-	externals : {
-
-	},
-	// addition - add source-map support
-	devtool : "source-map",
     node: {
         global: true,
         process: false,
@@ -47,8 +36,60 @@ module.exports = {
         module: false,
         clearImmediate: false,
         setImmediate: false
-    },
-    plugins: [
-    	pkgPlugin
-    ]
+    }
 }
+
+
+const es6Config = _.assign({}, config, {
+    name: "es2015",
+	entry : './public_api.ts',
+    output: {
+    	path : path.resolve(__dirname, 'dist'),
+		filename: "gremlin.es6.js"
+    },
+    plugins: [ pkgPlugin ],
+    module: {
+    	rules: [
+    		{
+    			test: /\.ts$/,
+    			use : {
+    				loader : 'awesome-typescript-loader',
+    				options: {
+    			        configFileName: 'src/tsconfig.es6.json'
+    			    },
+    			},
+    			exclude: [ /node_modules/, '**/*.spec.ts' ]
+    		}
+    	]
+    }
+});
+console.debug(es6Config);
+
+const umdConfig = _.assign({}, config, {
+    name: "umd",
+	entry : './public_api.ts',
+    output: {
+    	path : path.resolve(__dirname, 'dist'),
+		libraryTarget: 'umd',
+		library: "gremlinjs",
+		filename: "gremlin.umd.js"
+    },
+    module: {
+    	rules: [
+    		{
+    			test: /\.ts$/,
+    			use : {
+    				loader : 'awesome-typescript-loader'
+    			},
+    			exclude: [ /node_modules/, '**/*.spec.ts' ]
+    		}
+    	]
+    }
+});
+console.debug(umdConfig);
+
+
+// Return Array of Configurations
+module.exports = [
+    umdConfig, es6Config  	
+];
