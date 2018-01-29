@@ -8,13 +8,17 @@ export class GremlinQuery {
   onComplete: (data: GremlinQueryResponse) => any;
 
   onMessage(data: GremlinQueryResponse) {
-    console.log(data);
-    if (null === data && this.onComplete !== null) {
-      this.lastResponse.rawMessage = this.results.join();
-      this.onComplete(this.lastResponse);
+    if (null === data && this.lastResponse == null && this.onComplete !== null) {
+      this.onComplete(null);
     } else {
-      this.lastResponse = data;
-      this.results.push(data.rawMessage);
+      console.log(data);
+      if (null === data && this.onComplete !== null) {
+        this.lastResponse.rawMessage = this.results.join();
+        this.onComplete(this.lastResponse);
+      } else {
+        this.lastResponse = data;
+        this.results.push(data.rawMessage);
+      }
     }
   }
 
@@ -22,8 +26,8 @@ export class GremlinQuery {
    * returns a binary format ready for web-socket transfer
    */
   binaryFormat() {
-    let serializedMessage = this.jsonFormat();
-    serializedMessage = decodeURI(encodeURIComponent(serializedMessage));
+    const serializedMessage = this.options.accept + this.jsonFormat();
+    // serializedMessage = decodeURI(encodeURIComponent(serializedMessage));
 
     // Let's start packing the message into binary
     // mimeLength(1) + mimeType Length + serializedMessage Length
@@ -43,7 +47,7 @@ export class GremlinQuery {
   jsonFormat() {
     const msg = {
       requestId: this.id,
-      op: this.options.processor,
+      op: this.options.op,
       processor: this.options.processor,
       args: {
         gremlin: this.rawQuery,
@@ -51,7 +55,11 @@ export class GremlinQuery {
         language: this.options.language
       }
     }
-    const serializedMessage = this.options.accept + JSON.stringify(msg);
+    const serializedMessage = JSON.stringify(msg);
+    console.log('serializing request');
+    console.log(msg);
+    console.log('serialized request');
+    console.log(serializedMessage);
     return serializedMessage;
   }
 

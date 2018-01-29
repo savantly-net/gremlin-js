@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer';
 import { GremlinClientOptions } from './gremlin-client-options';
 import { GremlinEvent } from './gremlin.event';
 import { GremlinQuery } from './gremlin.query';
@@ -26,8 +25,10 @@ export class GremlinWebSocket {
       this._queue.push(gremlinQuery);
       return false;
     } else {
+      console.log('sending request');
+      console.log(gremlinQuery);
       this._queries[gremlinQuery.id] = gremlinQuery;
-      this._ws.send(gremlinQuery.jsonFormat());
+      this._ws.send(gremlinQuery.binaryFormat());
       return true;
     }
   }
@@ -43,6 +44,24 @@ export class GremlinWebSocket {
     }
   }
 
+  arrayBufferToString(buffer) {
+    console.log('converting buffer to string');
+    const bufView = new Uint8Array(buffer);
+    const length = bufView.length;
+    let result = '';
+    let addition = Math.pow(2, 8) - 1;
+
+    for (let i = 0; i < length; i += addition) {
+
+        if (i + addition > length) {
+            addition = length - i;
+        }
+        result += String.fromCharCode.apply(null, bufView.subarray(i, i + addition));
+    }
+    console.log('extracted string from buffer: ' + result);
+    return result;
+}
+
   /*
   *  Process all incoming raw message events sent by Gremlin Server, and dispatch
   *  to the appropriate command.
@@ -54,15 +73,18 @@ export class GremlinWebSocket {
     let statusCode;
     let statusMessage;
 
+    console.log('web socket received message');
+
     try {
       const {data} = message;
-      const dataBuffer = new Buffer(data, 'binary');
-      rawMessage = JSON.parse(dataBuffer.toString('utf-8'));
+      const rawMessageString = this.arrayBufferToString(data);
+      rawMessage = JSON.parse(rawMessageString);
       requestId = rawMessage.requestId;
       statusCode = rawMessage.status.code;
       statusMessage = rawMessage.status.message;
     } catch (e) {
       console.warn('MalformedResponse', 'Received malformed response message');
+      console.log(message);
       return;
     }
 
@@ -72,11 +94,13 @@ export class GremlinWebSocket {
     gremlinResponse.statusCode = statusCode;
     gremlinResponse.statusMessage = statusMessage;
 
+    console.log('preparing to excecute callback for request');
+
     // If we didn't find a waiting query for this response, emit a warning
     if (!this._queries[requestId]) {
       console.warn(
         'OrphanedResponse',
-        `Received response for missing or closed request: ${requestId}`,
+        `Received response for missing or closed request: ${requestId}, status: ${statusCode}, ${statusMessage}`,
       );
       return;
     }

@@ -14,6 +14,7 @@ export declare class GremlinWebSocket {
      * (First In, First Out).
      */
     executeQueue(): void;
+    arrayBufferToString(buffer: any): string;
     onMessage(message: any): void;
     onOpen(evt: any): void;
     onError(err: any): void;

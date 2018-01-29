@@ -12,13 +12,15 @@ export class GremlinClientOptions {
   rejectUnauthorized = true;
   op = 'eval';
   accept = 'application/json';
+  processor = '';
 
   user: string;
   password: string;
-  processor: string;
   aliases: string;
 
   setPath(path) {
     this.path = path && path.length && !path.startsWith('/') ? `/${path}` : path;
   }
+
+  constructor() {}
 }

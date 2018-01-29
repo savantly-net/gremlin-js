@@ -8,9 +8,10 @@ export declare class GremlinClientOptions {
     rejectUnauthorized: boolean;
     op: string;
     accept: string;
+    processor: string;
     user: string;
     password: string;
-    processor: string;
     aliases: string;
     setPath(path: any): void;
+    constructor();
 }
