@@ -1,6 +1,6 @@
 {
   "name": "@savantly/gremlin-js",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Gremlin client [Tinkerpop]",
   "module": "public_api.ts",
   "main": "dist/gremlin.js",
