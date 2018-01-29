@@ -1488,7 +1488,7 @@ glob-parent@^2.0.0:
   dependencies:
     is-glob "^2.0.0"
 
-glob@^7.0.3, glob@^7.0.5, glob@^7.0.6, glob@^7.1.1, glob@^7.1.2:
+glob@^7.0.3, glob@^7.0.5, glob@^7.0.6, glob@^7.1.1:
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.2.tgz#c19c9df9a028702d678612384a6552404c636d15"
   dependencies:
@@ -2138,6 +2138,12 @@ karma-jasmine-html-reporter@^0.2.2:
 karma-jasmine@^1.0.2, karma-jasmine@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/karma-jasmine/-/karma-jasmine-1.1.1.tgz#6fe840e75a11600c9d91e84b33c458e1c46a3529"
+
+karma-sourcemap-loader@^0.3.7:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/karma-sourcemap-loader/-/karma-sourcemap-loader-0.3.7.tgz#91322c77f8f13d46fed062b042e1009d4c4505d8"
+  dependencies:
+    graceful-fs "^4.1.2"
 
 karma-spec-reporter@0.0.31:
   version "0.0.31"

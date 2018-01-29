@@ -2,11 +2,20 @@ import {GremlinClientOptions} from './gremlin-client-options';
 import { GremlinQueryResponse } from './gremlin.query.response';
 import { Guid } from './guid';
 export class GremlinQuery {
+  private lastResponse: GremlinQueryResponse;
+  results: string[] = [];
   id = Guid.random();
   onComplete: (data: GremlinQueryResponse) => any;
 
   onMessage(data: GremlinQueryResponse) {
     console.log(data);
+    if (null === data && this.onComplete !== null) {
+      this.lastResponse.rawMessage = this.results.join();
+      this.onComplete(this.lastResponse);
+    } else {
+      this.lastResponse = data;
+      this.results.push(data.rawMessage);
+    }
   }
 
    /*

@@ -21,16 +21,17 @@ module.exports = function (config) {
       require('karma-jasmine-html-reporter'),
       require('karma-coverage-istanbul-reporter'),
       require('karma-spec-reporter'),
-      require('karma-webpack')
+      require('karma-webpack'),
+      require('karma-sourcemap-loader')
     ],
     client:{
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
     files: [
-      { pattern: specFiles, watched: false }
+      { pattern: specFiles }
     ],
     preprocessors: {
-    	'**/*.ts': ['webpack']
+    	'**/*.ts': ['webpack', 'sourcemap']
     },
     mime: {
       'text/x-typescript': ['ts','tsx']
@@ -45,7 +46,7 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: [],
-    singleRun: true
+    singleRun: false
   });
   
   if (!isWin) {

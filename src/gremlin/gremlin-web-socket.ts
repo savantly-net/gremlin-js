@@ -137,9 +137,9 @@ export class GremlinWebSocket {
     const address = `ws${this.options.ssl ? 's' : ''}://${this.options.host}:${this.options.port}${this.options.path}`;
     this._ws = new WebSocket(address);
     this._ws.binaryType = 'arraybuffer';
-    this._ws.onopen = this.onOpen;
-    this._ws.onerror = this.onError;
-    this._ws.onmessage = this.onMessage;
+    this._ws.onopen = (evt) => { this.onOpen(evt) };
+    this._ws.onerror = (evt) => { this.onError(evt) };
+    this._ws.onmessage = (evt) => { this.onMessage(evt) };
   }
 
   constructor(private options: GremlinClientOptions) {

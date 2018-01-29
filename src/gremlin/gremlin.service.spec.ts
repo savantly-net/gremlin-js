@@ -23,6 +23,7 @@ describe('GremlinService', () => {
     const options = new GremlinClientOptions();
     const connection = service.createConnection(options);
     service.sendMessage('g.V()', (response: GremlinQueryResponse) => {
+      console.info('test info');
       console.log(response);
       expect(response).toBeTruthy();
     });
