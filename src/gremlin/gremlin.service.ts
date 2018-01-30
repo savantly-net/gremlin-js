@@ -1,72 +1,37 @@
 import * as _ from 'lodash';
 
-import { GremlinClientOptions } from './gremlin-client-options';
-import { GremlinWebSocket } from './gremlin-web-socket';
+import { ChannelType, GremlinClientOptions } from './gremlin.client.options';
+import { IGremlinConnection } from './gremlin.connection.interface';
 import { GremlinEvent } from './gremlin.event';
 import { GremlinQuery } from './gremlin.query';
 import { GremlinQueryResponse } from './gremlin.query.response';
+import { GremlinWebSocket } from './gremlin.web.socket';
 import { Guid } from './guid';
 
 export class GremlinService {
-  options: GremlinClientOptions;
-  connection: GremlinWebSocket;
-  commands = {};
-  queue = [];
+  connection: IGremlinConnection;
   sessionId = Guid.random();
 
-  createConnection(options: GremlinClientOptions) {
-    this.options = options;
-    this.connection = new GremlinWebSocket(options);
-
+  createConnection() {
+    if (this.options.channelType === ChannelType.websocket) {
+      this.connection = new GremlinWebSocket(this.options);
+    } else {
+      console.error('only websocket channel is supported at this time');
+    }
     return this.connection;
   }
 
-  closeConnection() {
-    this.connection.close();
+  createQuery(gremlin: string, bindings: any = {}): GremlinQuery {
+    const query = new GremlinQuery(gremlin, bindings, this.options);
+    return query;
   }
 
-  /**
-   * Clear the queue after the connection is opened
-   */
-  onConnectionOpen() {
-    this.executeQueue();
-  }
-
-  /**
-   * Process the current command queue, sending commands to Gremlin Server
-   * (First In, First Out).
-   */
-  executeQueue() {
-    while (this.queue.length > 0) {
-      const {message} = this.queue.shift();
-      this.sendMessage(message);
+  sendMessage(query: GremlinQuery) {
+    if (!this.connection) {
+      this.createConnection();
     }
+    return this.connection.execute(query);
   }
 
-  cancelPendingCommands({message, details}) {
-    const commands = this.commands;
-    let command;
-    const error = new Error(message);
-    (error as any).details = details;
-
-    // Empty queue
-    this.queue.length = 0;
-    this.commands = {};
-
-    Object.keys(commands).forEach((key) => {
-      command = commands[key];
-      command.messageStream.emit('error', error);
-    });
-  }
-
-  sendMessage(message: string, callback?: (response: GremlinQueryResponse) => void) {
-    const query = new GremlinQuery(message, this.options);
-    query.onComplete = callback;
-    const sent = this.connection.sendMessage(query);
-    if (!sent) {
-      this.connection.open();
-    }
-  }
-
-  constructor() { }
+  constructor(private options: GremlinClientOptions) { }
 }

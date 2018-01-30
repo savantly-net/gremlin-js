@@ -48,6 +48,10 @@ module.exports = function (config) {
     browsers: [],
     singleRun: false
   });
+  if (isWin) {
+	  config.browsers.push('Firefox');
+  } else {
+	  config.browsers.push('Chrome');
+  }
   
-  config.browsers.push('Chrome');
 };

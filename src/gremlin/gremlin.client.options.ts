@@ -1,6 +1,12 @@
+import * as _ from 'lodash';
 
 // Breaking change in TinkerPop v3.2.2, connect to /gremlin rather than /
 // See: https://groups.google.com/d/topic/gremlin-users/x4hiHsmTsHM/discussion
+
+export enum ChannelType {
+  websocket = 'websocket',
+  rest = 'rest'
+}
 
 export class GremlinClientOptions {
   port = 8182;
@@ -10,17 +16,20 @@ export class GremlinClientOptions {
   useSession = true;
   ssl = false;
   rejectUnauthorized = true;
-  op = 'eval';
   accept = 'application/json';
   processor = '';
+  channelType: ChannelType = ChannelType.websocket;
 
   user: string;
   password: string;
-  aliases: string;
 
   setPath(path) {
     this.path = path && path.length && !path.startsWith('/') ? `/${path}` : path;
   }
 
-  constructor() {}
+  constructor(options?: any) {
+    if (options) {
+      Object.assign(this, options);
+    }
+  }
 }

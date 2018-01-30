@@ -1,11 +1,16 @@
-import {GremlinClientOptions} from './gremlin-client-options';
+import { Graphson } from './graphson';
+import { GremlinClientOptions } from './gremlin.client.options';
+import { GremlinQueryOperation } from './gremlin.query.operation';
 import { GremlinQueryResponse } from './gremlin.query.response';
 import { Guid } from './guid';
+
 export class GremlinQuery {
   private lastResponse: GremlinQueryResponse;
   results: any[] = [];
   id = Guid.random();
   onComplete: (data: GremlinQueryResponse) => any;
+  op = 'eval';
+  aliases: string;
 
   addResults(data: any[]) {
     for (const item of data) {
@@ -31,47 +36,30 @@ export class GremlinQuery {
     }
   }
 
-   /*
-   * returns a binary format ready for web-socket transfer
-   */
-  binaryFormat() {
-    const serializedMessage = this.options.accept + this.jsonFormat();
-    // serializedMessage = decodeURI(encodeURIComponent(serializedMessage));
-
-    // Let's start packing the message into binary
-    // mimeLength(1) + mimeType Length + serializedMessage Length
-    const binaryMessage = new Uint8Array(1 + serializedMessage.length);
-    binaryMessage[0] = this.options.accept.length;
-
-    for (let i = 0; i < serializedMessage.length; i++) {
-      binaryMessage[i + 1] = serializedMessage.charCodeAt(i);
-    }
-
-    return binaryMessage;
-  }
-
   /**
-   * returns a serialized json message ready for transfer
+   * returns a graphson formatted message
    */
-  jsonFormat() {
+  getGraphson(operation: GremlinQueryOperation) {
+    const saslbase64 = new Buffer('\0' + this.options.user + '\0' + this.options.password).toString('base64');
+    let args;
+    if (operation === GremlinQueryOperation.authentication) {
+      args = {sasl: saslbase64};
+    } else {
+      args = {
+        gremlin: this.gremlin,
+        bindings: this.bindings || {},
+        language: this.options.language
+      };
+    }
     const msg = {
       requestId: this.id,
-      op: this.options.op,
+      op: operation,
       processor: this.options.processor,
-      args: {
-        gremlin: this.rawQuery,
-        bindings: {}, // TODO: parse raw query into bindings
-        language: this.options.language
-      }
+      args
     }
-    const serializedMessage = JSON.stringify(msg);
-    console.log('serializing request');
-    console.log(msg);
-    console.log('serialized request');
-    console.log(serializedMessage);
-    return serializedMessage;
+    return new Graphson(msg);
   }
 
-  constructor(private rawQuery: string, private options: GremlinClientOptions) {}
+  constructor(private gremlin: string, private bindings: any, private options: GremlinClientOptions) {}
 
 }

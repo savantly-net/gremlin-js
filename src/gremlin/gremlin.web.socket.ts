@@ -1,36 +1,35 @@
-import { GremlinClientOptions } from './gremlin-client-options';
+import { Graphson } from './graphson';
+import { GremlinClientOptions } from './gremlin.client.options';
+import { IGremlinConnection } from './gremlin.connection.interface';
 import { GremlinEvent } from './gremlin.event';
 import { GremlinQuery } from './gremlin.query';
+import { GremlinQueryOperation } from './gremlin.query.operation';
 import { GremlinQueryResponse } from './gremlin.query.response';
+import { assertNotEmpty } from './utils';
 
-export class GremlinWebSocket {
+export class GremlinWebSocket implements IGremlinConnection {
   private _ws: WebSocket;
   private _queries: {[id: string]: GremlinQuery} = {};
-  private _queue = new Array<GremlinQuery>();
-
-  socket() {
-    return this._ws;
-  }
-
-  close() {
-    this._ws.close();
-  }
+  private _queue = new Array<Graphson>();
+  private maxReconnects = 30;
+  private reconnectAttempts = 0;
 
   isOpen() {
     return this._ws && this._ws.OPEN === this._ws.readyState;
   }
 
-  sendMessage(gremlinQuery: GremlinQuery) {
-    if (!this.isOpen()) {
-      this._queue.push(gremlinQuery);
-      return false;
-    } else {
-      console.log('sending request');
-      console.log(gremlinQuery);
-      this._queries[gremlinQuery.id] = gremlinQuery;
-      this._ws.send(gremlinQuery.binaryFormat());
-      return true;
+  execute(gremlinQuery: GremlinQuery) {
+    assertNotEmpty(gremlinQuery.id);
+    this._queries[gremlinQuery.id] = gremlinQuery;
+    const graphson = this.queryToGraphson(gremlinQuery, GremlinQueryOperation.eval);
+    this._queue.push(graphson);
+    if (this.isOpen()) {
+      this.executeQueue();
     }
+  }
+
+  sendBinaryMessage(binaryData: Uint8Array) {
+    this._ws.send(binaryData);
   }
 
   /**
@@ -39,9 +38,15 @@ export class GremlinWebSocket {
    */
   executeQueue() {
     while (this._queue.length > 0) {
-      const query = this._queue.shift();
-      setTimeout(this.sendMessage(query), 1000);
+      const graphson = this._queue.shift();
+      const binaryData = this.graphsonToBinary(graphson);
+      this.sendBinaryMessage(binaryData);
     }
+  }
+
+  cancelPendingCommands({message, details}) {
+    this._queue.length = 0;
+    this._queries = {};
   }
 
   arrayBufferToString(buffer) {
@@ -121,16 +126,36 @@ export class GremlinWebSocket {
         query.onMessage(rawMessage);
         break;
       case 407: // AUTHENTICATE CHALLANGE
-        // const challengeResponse = this.buildChallengeResponse(requestId);
-        // this.sendMessage(challengeResponse);
-        // TODO: create authentication
-        console.error('requires authentication');
+        const challengeResponse = this.buildChallengeResponse(query);
+        this._queue.push(challengeResponse);
+        this.executeQueue();
         break;
       default:
         delete this._queries[requestId];
         console.error(statusMessage + ' (Error ' + statusCode + ')');
         break;
     }
+  }
+
+  onClose(evt) {
+    console.log('connection closed');
+    if (this._queue.length > 0) {
+      console.warn(`${this._queue.length} queries are queued`);
+    }
+    if (this.reconnectAttempts < this.maxReconnects && !this.open()) {
+      this.reconnect();
+    } else if (!this.open()) {
+      console.warn('giving up reconnecting');
+    } else {
+      this.reconnectAttempts = 0;
+    }
+  }
+
+  reconnect() {
+    setTimeout(() => {
+      console.log('reconnecting');
+      this.onClose(null);
+    }, 1000);
   }
 
   onOpen(evt) {
@@ -143,28 +168,54 @@ export class GremlinWebSocket {
     console.error(err);
   }
 
-  buildChallengeResponse(requestId) {
-    const {processor, op, accept, language, aliases} = this.options;
+  buildChallengeResponse(query: GremlinQuery): Graphson {
+    const {processor, accept, language } = this.options;
     const saslbase64 = new Buffer('\0' + this.options.user + '\0' + this.options.password).toString('base64');
     const args = {sasl: saslbase64}
 
     const message = {
-      requestId,
+      requestId: query.id,
       processor,
-      op: 'authentication',
+      op: GremlinQueryOperation.authentication,
       args,
     };
+    const graphson = new Graphson(message);
 
-    return message;
+    return graphson;
+  }
+
+  queryToGraphson(query: GremlinQuery, operation: GremlinQueryOperation) {
+    console.log(`queryToGraphson: ${query.id}`);
+    return query.getGraphson(operation);
+  }
+
+   /*
+   * returns a binary format ready for web-socket transfer
+   */
+  graphsonToBinary(query: Graphson) {
+    const serializedMessage = this.options.accept + JSON.stringify(query);
+
+    // Let's start packing the message into binary
+    // mimeLength(1) + mimeType Length + serializedMessage Length
+    const binaryMessage = new Uint8Array(1 + serializedMessage.length);
+    binaryMessage[0] = this.options.accept.length;
+
+    for (let i = 0; i < serializedMessage.length; i++) {
+      binaryMessage[i + 1] = serializedMessage.charCodeAt(i);
+    }
+    return binaryMessage;
   }
 
   isConnecting() {
     return this._ws && this._ws.readyState === this._ws.CONNECTING;
   }
 
+  /*
+   * return true if open or connecting
+   */
   open() {
     if (this.isOpen() || this.isConnecting()) {
-      return;
+      return true;
     }
     const address = `ws${this.options.ssl ? 's' : ''}://${this.options.host}:${this.options.port}${this.options.path}`;
     this._ws = new WebSocket(address);
@@ -172,6 +223,8 @@ export class GremlinWebSocket {
     this._ws.onopen = (evt) => { this.onOpen(evt) };
     this._ws.onerror = (evt) => { this.onError(evt) };
     this._ws.onmessage = (evt) => { this.onMessage(evt) };
+    this._ws.onclose = (evt) => { this.onClose(evt) };
+    return false;
   }
 
   constructor(private options: GremlinClientOptions) {

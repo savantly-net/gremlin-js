@@ -1,5 +1,11 @@
 import * as _ from 'lodash';
 
+export function assertNotEmpty(obj: any, msg: string = '') {
+  if (obj === null || obj === undefined || obj.length === 0) {
+    console.error('argument should not be empty: ' + msg);
+  }
+}
+
 /**
  * Given optional and polymorphic arguments, return an object with a raw
  * 'gremlin' string and optional 'bindings' object.

@@ -11,12 +11,21 @@
 	<script>
 		$(document).ready(function(){
 			var options = new gremlinjs.GremlinClientOptions();
-			var service = new gremlinjs.GremlinService();
-			var connection = service.createConnection(options);
-			service.sendMessage('g.V().limit(50).values()', function(response){
+			var service = new gremlinjs.GremlinService(options);
+			
+			var query = service.createQuery('g.V().limit(50).values()');
+			
+			query.onComplete = function(response) {
 				console.log(response);
-				$('#results').text(response.data);
-			});
+				$('#results').text(JSON.stringify(response.data));
+			}
+			
+			/* or in ES6
+ 			query.onComplete = (response) => {
+				console.log(response);
+			}; */
+			
+			service.sendMessage(query);
 		});
 	</script>
 </html>

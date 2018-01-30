@@ -1,4 +1,4 @@
-import { GremlinClientOptions } from './gremlin-client-options';
+import { GremlinClientOptions } from './gremlin.client.options';
 import { GremlinService } from './gremlin.service';
 import {GremlinQuery} from './gremlin.query';
 import { GremlinQueryResponse } from './gremlin.query.response';
@@ -7,7 +7,7 @@ let service: GremlinService;
 
 describe('GremlinService', () => {
   beforeEach(() => {
-    service = new GremlinService();
+    service = new GremlinService(new GremlinClientOptions());
   });
 
   it('should be created', () => {
@@ -15,17 +15,17 @@ describe('GremlinService', () => {
   });
 
   it('should create a connection', () => {
-    const connection = service.createConnection(new GremlinClientOptions());
+    const connection = service.createConnection();
     expect(connection).toBeTruthy();
   });
 
   it('should execute a gremlin query', (done) => {
-    const options = new GremlinClientOptions();
-    const connection = service.createConnection(options);
-    service.sendMessage('g.V()', (response: GremlinQueryResponse) => {
-      console.info('test info');
+    const connection = service.createConnection();
+    const query = service.createQuery('g.V()');
+    query.onComplete = (response) => {
       console.log(response);
       done();
-    });
+    };
+    service.sendMessage(query);
   });
 });
