@@ -14,9 +14,9 @@ export class GremlinQuery {
   }
 
   onMessage(response: GremlinQueryResponse) {
-    const hasCallback = (this.onComplete !== undefined || this.onComplete !== null);
+    const hasCallback = (this.onComplete !== undefined && this.onComplete !== null);
     const emptyResponse = null === response;
-    const hasLastResponse = (this.lastResponse !== undefined || this.lastResponse !== null);
+    const hasLastResponse = (this.lastResponse !== undefined && this.lastResponse !== null);
 
     if (!emptyResponse) {
       this.addResults(response.rawMessage.result.data);
