@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<script type="text/javascript" src="gremlin.umd.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+	</head>
+	<body>
+		<div>
+			<div id="results"></div>
+		</div>
+	</body>
+	<script>
+		$(document).ready(function(){
+			var options = new gremlinjs.GremlinClientOptions();
+			var service = new gremlinjs.GremlinService();
+			var connection = service.createConnection(options);
+			service.sendMessage('g.V().limit(50).values()', function(response){
+				console.log(response);
+				$('#results').text(response.data);
+			});
+		});
+	</script>
+</html>

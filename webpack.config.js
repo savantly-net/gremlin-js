@@ -62,7 +62,6 @@ const umdConfig = _.assign({}, config, {
 		filename: "gremlin.umd.js"
     }
 });
-console.debug(umdConfig);
 
 
 // Return Array of Configurations

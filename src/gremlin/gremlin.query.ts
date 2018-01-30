@@ -3,22 +3,31 @@ import { GremlinQueryResponse } from './gremlin.query.response';
 import { Guid } from './guid';
 export class GremlinQuery {
   private lastResponse: GremlinQueryResponse;
-  results: string[] = [];
+  results: any[] = [];
   id = Guid.random();
   onComplete: (data: GremlinQueryResponse) => any;
 
-  onMessage(data: GremlinQueryResponse) {
-    if (null === data && this.lastResponse == null && this.onComplete !== null) {
+  addResults(data: any[]) {
+    for (const item of data) {
+      this.results.push(item);
+    }
+  }
+
+  onMessage(response: GremlinQueryResponse) {
+    const hasCallback = this.onComplete !== null;
+    const emptyResponse = null === response;
+    const hasLastResponse = this.lastResponse !== null;
+
+    if (!emptyResponse) {
+      this.addResults(response.rawMessage.result.data);
+      this.lastResponse = response;
+    }
+
+    if (emptyResponse && hasCallback && !hasLastResponse) {
       this.onComplete(null);
-    } else {
-      console.log(data);
-      if (null === data && this.onComplete !== null) {
-        this.lastResponse.rawMessage = this.results.join();
-        this.onComplete(this.lastResponse);
-      } else {
-        this.lastResponse = data;
-        this.results.push(data.rawMessage);
-      }
+    } else if (emptyResponse && hasCallback && hasLastResponse) {
+      this.lastResponse.data = this.results;
+      this.onComplete(this.lastResponse);
     }
   }
 
