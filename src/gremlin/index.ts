@@ -1,6 +1,9 @@
-export { GremlinService } from './gremlin.service';
-export { GremlinQuery } from './gremlin.query';
-export { GremlinQueryResponse } from './gremlin.query.response';
-export { GremlinEvent } from './gremlin.event';
+export { Graphson } from './graphson';
 export { GremlinClientOptions } from './gremlin.client.options';
+export { IGremlinConnection } from './gremlin.connection.interface';
+export { GremlinEvent } from './gremlin.event';
+export { GremlinQueryOperation } from './gremlin.query.operation';
+export { GremlinQueryResponse } from './gremlin.query.response';
+export { GremlinQuery } from './gremlin.query';
+export { GremlinService } from './gremlin.service';
 export { GremlinWebSocket } from './gremlin.web.socket';
