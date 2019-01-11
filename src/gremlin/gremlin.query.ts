@@ -13,9 +13,9 @@ export class GremlinQuery {
   aliases: string;
 
   addResults(data: any[]) {
-    for (const item of data) {
-      this.results.push(item);
-    }
+    //for (const item of data) {
+      this.results.push(data);
+    //}
   }
 
   onMessage(response: GremlinQueryResponse) {
@@ -40,7 +40,7 @@ export class GremlinQuery {
    * returns a graphson formatted message
    */
   getGraphson(operation: GremlinQueryOperation) {
-    const saslbase64 = new Buffer('\0' + this.options.user + '\0' + this.options.password).toString('base64');
+    const saslbase64 = btoa('\0' + this.options.user + '\0' + this.options.password)
     let args;
     if (operation === GremlinQueryOperation.authentication) {
       args = {sasl: saslbase64};
