@@ -1,0 +1,26 @@
+{
+	"name": "@savantly/gremlin-js",
+	"version": "1.2.1",
+	"description": "Gremlin client [Tinkerpop]",
+	"main": "gremlin.umd.js",
+	"homepage": "https://github.com/savantly-net/gremlin-js",
+	"private": false,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/savantly-net/gremlin-js.git"
+	},
+	"browser": true,
+	"keywords": [
+		"Tinkerpop",
+		"Gremlin"
+	],
+	"author": "Jeremy@Savantly.net",
+	"license": "MIT",
+	"peerDependencies": {
+		"rxjs": "^5.4.3"
+	},
+	"dependencies": {
+		"@types/node": "^10.12.18"
+	},
+	"module": "index.js"
+}

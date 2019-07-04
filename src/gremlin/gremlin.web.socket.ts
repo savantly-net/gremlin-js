@@ -170,7 +170,7 @@ export class GremlinWebSocket implements IGremlinConnection {
 
   buildChallengeResponse(query: GremlinQuery): Graphson {
     const {processor, accept, language } = this.options;
-    const saslbase64 = new Buffer('\0' + this.options.user + '\0' + this.options.password).toString('base64');
+    const saslbase64 = btoa('\0' + this.options.user + '\0' + this.options.password);
     const args = {sasl: saslbase64}
 
     const message = {
