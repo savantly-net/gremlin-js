@@ -1,6 +1,6 @@
 {
 	"name": "@savantly/gremlin-js",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "Gremlin client [Tinkerpop]",
 	"main": "gremlin.umd.js",
 	"homepage": "https://github.com/savantly-net/gremlin-js",
@@ -19,8 +19,6 @@
 	"peerDependencies": {
 		"rxjs": "^5.4.3"
 	},
-	"dependencies": {
-		"@types/node": "^10.12.18"
-	},
+	"dependencies": {},
 	"module": "index.js"
 }
