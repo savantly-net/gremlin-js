@@ -13,7 +13,7 @@ export class GremlinQuery {
   aliases: string;
 
   addResults(data: any[]) {
-    for (const item of data) {
+    for (const item of Object.values(data)[1]) {
       this.results.push(item);
     }
   }
